@@ -1,0 +1,109 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Device::Router::RTX - interact with Yamaha RTX routers
+
+=head1 SYNOPSIS
+
+=head1 METHODS
+
+=head2 new
+
+    my $rtx = Device::Router::RTX->new (
+        address => '12.34.56.78',
+        password => 'password',
+        admin_password => 'administrator password',
+    );
+
+Create a new object for communicating with the router. The IP address
+of the router is compulsory. If the router has a password set, you
+also need to supply a password.
+
+This does not open a telnet connection to the router. Use L</connect>
+to open the telnet connection.
+
+=head2 connect
+
+    $rtx->connect ();
+
+Connect to the router. This dies if there is an error.
+
+=head2 get_config
+
+    $rtx->get_config ("config");
+
+Get the router's configuration file and put it into the file
+F<config>.
+
+=head2 read_config
+
+    $rtx->read_config ("config");
+
+Read a router configuration file from the file specified. (This method
+is not fully functional yet.)
+
+=head2 save
+
+    $rtx->save ();
+
+Save an altered configuration to the router's permanent memory.
+
+=head2 command
+
+    $rtx->command ($command);
+
+Send a command to the router specified by C<$command>, and save it.
+
+=head2 wake
+
+   $rtx->wake (<LAN>,<MAC>);
+
+Send a "wake-on-lan" ("wol") packet to the specified MAC address on
+the specified LAN (give the number of the LAN, e.g. 1-3 for RTX1000
+routers). There is no return value.
+
+=head2 arp
+
+    my $arp = $rtx->arp();
+    if ($arp) {
+        for my $entry (@$arp) {
+            print "MAC: $entry->{mac} IP: $entry->{ip}.\n";
+        } 
+    } 
+
+Read the router's arp table. The return value is the undefined value
+if the command fails, or an array reference containing hash references
+if it succeeds. The hash references have four fields, C<lan> (the
+number of the local area network), C<ip> (the IP address), C<mac> (the
+MAC address) and C<ttl> (time to live).
+
+=head1 SEE ALSO
+
+=head2 About RTX routers
+
+=over
+
+=item L<http://jp.yamaha.com/products/network/routers/> 
+
+Yamaha's router site.
+
+=item L<http://www.lemoda.net/networking/rtx1000/> 
+
+A guide to some of the router's commands.
+
+=back
+
+=head2 Other Perl modules
+
+L<Net::MAC::Vendor> - look up the vendor for a MAC.
+
+=head1 DISCLAIMER
+
+The author of this Perl module is not and has never been affiliated
+with Yamaha Corporation. The author cannot take any responsibility for
+what happens to your router if you use this module. Use at your own
+risk.
+
+[% INCLUDE "author" %]
+

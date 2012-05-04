@@ -1,9 +1,3 @@
-=head1 NAME
-
-Device::Router::RTX - interact with Yamaha RTX routers
-
-=cut
-
 package Device::Router::RTX;
 require Exporter;
 @ISA = qw(Exporter);
@@ -115,12 +109,6 @@ sub connect
     }
     $rtx->{telnet_connection} = $telnet_connection;
 }
-
-=head2 get_config
-
-   $rtx->get_config ("config");
-
-=cut
 
 my $_config_desc = "RTX1000 configuration file";
 
@@ -301,7 +289,7 @@ sub _command
 
 sub save
 {
-    my ($rtx, $command) = @_;
+    my ($rtx) = @_;
     _check ($rtx);
     my @lines = $rtx->_command ("save\n");
     my $retval = join ("", @lines);
@@ -318,14 +306,6 @@ sub _admin_login
     $rtx->{admin} = 1;
 }
 
-=head2 command
-
-    $rtx->command ();
-
-Do a command for a user.
-
-=cut
-
 sub command
 {
     my ($rtx, $command) = @_;
@@ -340,15 +320,6 @@ sub _check_mac
     die "Bad MAC address '$mac'" unless $mac =~ /$mac_re/i;
 }
 
-=head2 wake
-
-   $rtx->wake (<LAN>,<MAC>);
-
-Send a "wake-on-lan" ("wol") packet to the specified MAC address on
-the specified LAN. No return value.
-
-=cut
-
 sub wake
 {
     my ($rtx, $lan, $mac) = @_;
@@ -358,14 +329,6 @@ sub wake
     my @output = $rtx->_command ("wol send lan$lan $mac");
     print "@output\n";
 }
-
-=head2 arp
-
-    $rtx->arp();
-
-Read the router's arp table.
-
-=cut
 
 sub arp
 {
