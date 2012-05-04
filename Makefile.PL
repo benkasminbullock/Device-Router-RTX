@@ -12,6 +12,8 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
+        'Net::Telnet' => 0,
+        'Net::TFTP' => 0,
     },
     META_MERGE => {
         resources => {
