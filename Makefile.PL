@@ -3,12 +3,13 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my $pm = 'lib/Device/Router/RTX.pm';
+my $pod = 'lib/Device/Router/RTX.pod';
 my $repo = 'https://github.com/benkasminbullock/Device-Router-RTX';
 
 WriteMakefile (
     NAME => 'Device::Router::RTX',
     VERSION_FROM => $pm,
-    ABSTRACT_FROM => $pm,
+    ABSTRACT_FROM => $pod,
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
