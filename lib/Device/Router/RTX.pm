@@ -4,7 +4,7 @@ require Exporter;
 @EXPORT_OK = qw//;
 use warnings;
 use strict;
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 use Carp qw/carp croak/;
 # DEPENDS
@@ -12,6 +12,7 @@ use Net::Telnet;
 use Net::TFTP;
 # use Net::IP;
 # END DEPENDS
+
 sub _read_config
 {
     my ($configfile, $args) = @_;
@@ -39,35 +40,42 @@ EOF
 
 sub new
 {
+    my ($class, %args) = @_;
     my $rtx = {};
-    my %args = @_;
-    for (keys %args) { $_ = lc $_ }
+    for (keys %args) {
+	$_ = lc $_;
+    }
     if ($args{config}) {
 	_read_config ($args{config}, \%args);
     }
     if (!$args{store}) {
-	carp "No file store specified";
-    } elsif (! -d $args{store}) {
+#	carp "No file store specified";
+    }
+    elsif (! -d $args{store}) {
 #	carp "File store '$args{store}' is not a valid directory";
-    } else {
+    }
+    else {
 	$rtx->{store} = $args{store};
     }
     if (!$args{address}) {
 	croak "No internet protocol address for router";
-	return;
-    } else {
+    }
+    else {
 	$rtx->{address} = $args{address};
     }
     if (defined($args{password})) {
 	$rtx->{password} = $args{password};
-    } else {
+    }
+    else {
 	$rtx->{password} = "";
     }
     if (defined($args{admin_password})) {
 	$rtx->{admin_password} = $args{admin_password};
-    } else {
+    }
+    else {
 	$rtx->{admin_password} = "";
     }
+    $rtx->{verbose} = $args{verbose};
     bless $rtx;
     return $rtx;
 }
@@ -87,18 +95,19 @@ sub connect
 {
     my ($rtx) = @_;
     _check ($rtx);
-#    my $telnet_connection = new Net::Telnet(Dump_Log => "stuff.txt");
+#    my $telnet_connection = new Net::Telnet (Dump_Log => "stuff.txt");
     my $telnet_connection = new Net::Telnet();
 #    $telnet_connection->option_log (*STDERR);
     # See documentation for Net::Telnet
-    $telnet_connection->open($rtx->{address});
+    $telnet_connection->open ($rtx->{address});
     if ($rtx->{password}) {
 #	$telnet_connection->print ();
-	my $stuff = $telnet_connection->get();
+	my $stuff = $telnet_connection->get ();
 #	print "stuff is: $stuff\n";
 	if ($stuff =~ m'Error:  Other user logged in by telnet.') {
 	    die "Someone else is already logged in.\n";
-	} else {
+	}
+	else {
 	    $telnet_connection->print ($rtx->{password});
 	}
 	if ($telnet_connection->eof()) {
@@ -117,13 +126,30 @@ sub get_config
     my ($rtx, $filename) = @_;
     $filename = "config" unless $filename;
     _check ($rtx);
-    my $tftp = Net::TFTP->new($rtx->{address});
+    my $tftp = Net::TFTP->new ($rtx->{address});
     $tftp->ascii;
     if (-f $filename) {
 	warn "$_config_desc '$filename' already exists.\n";
 	return;
     }
-    $tftp->get("config", $filename);
+    my $remotefile = "config";
+    if ($rtx->{admin_password}) {
+	$remotefile .= "/$rtx->{admin_password}";
+    }
+    elsif ($rtx->{password}) {
+	$remotefile .= "/$rtx->{password}";
+	carp "Admin password is not set";
+    }
+    else {
+	carp "Neither admin nor user passwords are set";
+    }
+    if ($rtx->{verbose}) {
+	print "Getting $remotefile\n";
+    }
+    $tftp->get ($remotefile, $filename);
+    if ($tftp->error ()) {
+	die "tftp get '$remotefile failed': ",$tftp->error ();
+    }
     die "TFTP failed" unless -f $filename;
 #    open my $input, "<", $filename or die $!;
 #    while (<$input>) { print }

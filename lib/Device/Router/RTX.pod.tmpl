@@ -18,7 +18,8 @@ Device::Router::RTX - interact with Yamaha RTX routers
 
 Create a new object for communicating with the router. The IP address
 of the router is compulsory. If the router has a password set, you
-also need to supply a password.
+also need to supply a password. For some commands, you need to set the
+administrator password.
 
 This does not open a telnet connection to the router. Use L</connect>
 to open the telnet connection.
@@ -27,21 +28,26 @@ to open the telnet connection.
 
     $rtx->connect ();
 
-Connect to the router. This dies if there is an error.
+Connect to the router. This dies if there is an error. If you need to
+debug the telnet connection, see the source code of the module which
+contains extensive debugging code (commented out for the production
+version).
 
 =head2 get_config
 
     $rtx->get_config ("config");
 
 Get the router's configuration file and put it into the file
-F<config>.
+F<config>. This uses TFTP (trivial FTP). It dies on error. If you have
+not set an administrator password in L</new> but your router requires
+one, this will fail with an error "Access violation".
 
 =head2 read_config
 
     $rtx->read_config ("config");
 
-Read a router configuration file from the file specified. (This method
-is not fully functional yet.)
+Read a router configuration file from the specified local file. (This
+method is not fully functional yet.)
 
 =head2 save
 
@@ -78,6 +84,38 @@ if it succeeds. The hash references have four fields, C<lan> (the
 number of the local area network), C<ip> (the IP address), C<mac> (the
 MAC address) and C<ttl> (time to live).
 
+=head1 TESTING
+
+The default module test does nothing except try to load the module and
+then exit. There is an extra test in the file <xt/connecting-test.t>
+which actually tries to connect to the router and do a few things. You
+can either edit this file to insert the password and IP address of
+your router, or you can set the following environment variables:
+
+=over
+
+=item RTX_ADDRESS
+
+Set this to the IP address of your router.
+
+=item RTX_PASSWORD
+
+Set this to the user password of your router. If the router's password
+is unset, set this to an empty string.
+
+=item RTX_ADMIN_PASSWORD
+
+This is the administrator password.
+
+=back
+
+When you run the test and some environment variables are incorrectly
+set, then run the test again shortly afterwards, or if you run the
+test when you already have a telnet session open, you may find that
+the telnet connection is refused. This is a limitation of the device
+itself, so close all connections, wait for a short time, and try
+again.
+
 =head1 SEE ALSO
 
 =head2 About RTX routers
@@ -98,12 +136,23 @@ A guide to some of the router's commands.
 
 L<Net::MAC::Vendor> - look up the vendor for a MAC.
 
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Net::Telnet>
+
+=item L<Net::TFTP>
+
+=back
+
 =head1 DISCLAIMER
 
 The author of this Perl module is not and has never been affiliated
 with Yamaha Corporation. The author cannot take any responsibility for
-what happens to your router if you use this module. Use at your own
-risk.
+what happens to your router or other security systems if you use this
+module. Please carefully evaluate the source code before operating,
+and use this code only at your own risk.
 
 [% INCLUDE "author" %]
 
