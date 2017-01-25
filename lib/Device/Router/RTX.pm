@@ -338,7 +338,7 @@ sub command
     my ($rtx, $command) = @_;
     _check ($rtx);
     $rtx->_command ("$command\n");
-    $rtx->save ("$command\n");
+    $rtx->save ();
 }
 
 sub _check_mac
