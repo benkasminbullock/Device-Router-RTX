@@ -1,3 +1,4 @@
+[% start_year=2012 %]
 =encoding UTF-8
 
 =head1 NAME
@@ -6,14 +7,25 @@ Device::Router::RTX - interact with Yamaha RTX routers
 
 =head1 SYNOPSIS
 
+[% INCLUDE "synopsis.pl" | xtidy %]
+
+=head1 VERSION
+
+This documents [% info.colon %] version [% info.version %]
+corresponding to git commit L<[% commit.commit %]|[% info.repo
+%]/commit/[% commit.commit %]> released on [% commit.date %].
+
+=head1 DESCRIPTION
+
+This module allows one to automate some interactions with Yamaha RTX
+routers.
+
 =head1 METHODS
 
 =head2 new
 
     my $rtx = Device::Router::RTX->new (
         address => '12.34.56.78',
-        password => 'password',
-        admin_password => 'administrator password',
     );
 
 Create a new object for communicating with the router. The IP address
@@ -23,6 +35,33 @@ administrator password.
 
 This does not open a telnet connection to the router. Use L</connect>
 to open the telnet connection.
+
+The fields which may be supplied to C<new> are
+
+=over
+
+=item address
+
+The IP address of the router on your subnet.
+
+=item password
+
+If your router has a password set, supply it here.
+
+=item admin_password
+
+If your router has an administrator password set, supply it here.
+
+=item config
+
+The name of your configuration file. If you supply this, it reads it
+using L</read_config>.
+
+=item verbose
+
+Print debugging messages.
+
+=back
 
 =head2 connect
 
@@ -46,8 +85,9 @@ one, this will fail with an error "Access violation".
 
     $rtx->read_config ("config");
 
-Read a router configuration file from the specified local file. (This
-method is not fully functional yet.)
+Read a router configuration file from the specified local file.
+
+Not every option of the router is specified.
 
 =head2 save
 
@@ -87,10 +127,11 @@ MAC address) and C<ttl> (time to live).
 =head1 TESTING
 
 The default module test does nothing except try to load the module and
-then exit. There is an extra test in the file <xt/connecting-test.t>
-which actually tries to connect to the router and do a few things. You
-can either edit this file to insert the password and IP address of
-your router, or you can set the following environment variables:
+then exit. There is an extra test in the file
+F<extratests/connecting-test.t> which actually tries to connect to the
+router and do a few things. You can either edit this file to insert
+the password and IP address of your router, or you can set the
+following environment variables:
 
 =over
 
@@ -122,13 +163,17 @@ again.
 
 =over
 
-=item L<http://jp.yamaha.com/products/network/routers/> 
+=item L<Yamaha's router site|http://jp.yamaha.com/products/network/routers/> 
 
-Yamaha's router site.
+Japanese-language site. I'm not aware of an English language site.
 
-=item L<http://www.lemoda.net/networking/rtx1000/> 
+=item L<Yamaha RTX1000 router|http://www.lemoda.net/networking/rtx1000/> 
 
 A guide to some of the router's commands.
+
+=item L<Getting started with Yamaha Routers by Simon Gibson at Denphone|http://www.denphone.com/getting-started-with-yamaha-routers>
+
+A guide to some commands.
 
 =back
 

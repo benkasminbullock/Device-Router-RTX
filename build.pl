@@ -3,6 +3,6 @@ use warnings;
 use strict;
 use Perl::Build;
 perl_build (
-    pod => ['lib/Device/Router/RTX.pod',],
+    make_pod => './make-pod.pl',
 );
 exit;

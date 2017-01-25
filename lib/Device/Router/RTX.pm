@@ -4,7 +4,7 @@ require Exporter;
 @EXPORT_OK = qw//;
 use warnings;
 use strict;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp qw/carp croak/;
 # DEPENDS
@@ -279,7 +279,8 @@ sub read_config
 	    my $scope_hash = $config->{dhcp}->{$scope};
 	    if (!$scope_hash) {
 		print "Warning: unknown scope $scope\n";
-	    } else {
+	    }
+	    else {
 		my $ip = $2;
 		_check_range ($scope_hash->{range}, $ip);
 		my $mac = $4;
