@@ -1,7 +1,7 @@
 use Test::More;
 use warnings;
 use strict;
-use FindBin;
+use FindBin '$Bin';
 use Device::Router::RTX;
 
 
@@ -32,7 +32,7 @@ for my $line (@$arp) {
 	"Got required fields from arp");
 }
 
-my $config = "$FindBin::Bin/rtx-config-temp.$$";
+my $config = "$Bin/rtx-config-temp.$$";
 
 if (-f $config) {
     unlink $config or die $!;
