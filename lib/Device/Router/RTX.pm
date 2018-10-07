@@ -271,7 +271,7 @@ sub read_config
 	if ($line =~ /dhcp\s+scope\s+(\d+)\s+$ip_range_re/) {
 	    my $scope = $1;
 	    my $range = $2;
-	    $config->{dhcp}->{$scope}->{range} = $2;
+	    $config->{dhcp}->{$scope}->{range} = $range;
 	    next;
 	}
 	if ($line =~ /dhcp\s+scope\s+bind\s+(\d+)\s+($ip_address)\s+(ethernet\s+)?($mac_re)/i) {
@@ -305,9 +305,11 @@ sub _command
     my ($rtx, $command) = @_;
     _check ($rtx);
     $rtx->connect() unless $rtx->{telnet_connection};
-    $rtx->_admin_login();
-    my @lines = $rtx->{telnet_connection}->cmd ("$command\n");
+    my @lines = $rtx->_admin_login();
     my $retval = join ("", @lines);
+    die "Error in admin login: $retval" if $retval =~ /Error:/;
+    @lines = $rtx->{telnet_connection}->cmd ("$command\n");
+    $retval = join ("", @lines);
     die "Error doing '$command': $retval" if $retval =~ /Error:/;
     return @lines;
 }
@@ -331,6 +333,7 @@ sub _admin_login
     my $admin_login_cmd = "administrator\n$rtx->{admin_password}\n";
     my @reply =	$rtx->{telnet_connection}->cmd($admin_login_cmd);
     $rtx->{admin} = 1;
+    return @reply;
 }
 
 sub command
